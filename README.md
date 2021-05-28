@@ -1,16 +1,5 @@
-# Quasar App (kview)
+KView是一款基于 electron&Vue 的 Konachan 桌面应用
 
-A Quasar Framework app
-
-## Install the dependencies
-```bash
-yarn
-```
-
-### Start the app in development mode
-```bash
-quasar dev
-```
 ### Start the app in electron mode
 ```bash
 quasar dev -m electron
