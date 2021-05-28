@@ -10,7 +10,6 @@
           aria-label="Menu"
           @click="downloadDrawerOpen"
         />
-<!--        <q-radio size="xs" v-model="selectAll" :val="true"/>-->
         <q-btn
           flat
           dense
@@ -21,14 +20,8 @@
             <div class="row no-wrap q-pa-md">
               <div class="column">
                 <q-input v-model="key" label="关键词(空格分隔)">
-<!--                  <template v-slot:prepend>-->
-<!--                    <q-icon name="event" />-->
-<!--                  </template>-->
                 </q-input>
                 <q-input v-model="pageSize" label="每页图片数">
-<!--                  <template v-slot:prepend>-->
-<!--                    <q-icon name="event" />-->
-<!--                  </template>-->
                 </q-input>
               </div>
               <q-separator vertical inset class="q-mx-lg" />
@@ -148,6 +141,13 @@ export default {
   },
   created() {
     this.getSumNumber()
+    /***
+     * tag点击搜索
+     */
+    eventBus.$off("tagClick");
+    eventBus.$on('tagClick', function(data){
+      this.key = data
+    }.bind(this))
   },
   mounted() {
 

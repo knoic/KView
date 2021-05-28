@@ -167,7 +167,7 @@ function getSum(){
   })
 }
 /***
- * 请求首页，获取总图片数,弃用
+ * 请求首页，获取总图片数
  * @param pageSize
  * @param pageNumber
  * @returns {Promise<unknown>}

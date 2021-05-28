@@ -5,27 +5,35 @@
         <q-card>
           <q-img :src="item.preview_url" style="width: 50px"/>
           <q-card-actions>
-            <q-menu
-              anchor="top right"
-              transition-show="flip-right"
-              transition-hide="flip-left"
-            >
-              <q-list style="min-width: 100px">
-                <q-item clickable>
-                  <q-item-section>author：{{item.author}}</q-item-section>
-                </q-item>
-                <q-item clickable>
-                  <q-item-section>file_size：{{item.file_size}}</q-item-section>
-                </q-item>
-<!--                <q-separator />-->
-                <q-item clickable>
-                  <q-item-section>{{item.width}}*{{item.height}}</q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
             <q-checkbox size="xs" v-model="selectVal" :val="item"/>
             <q-space />
-            <q-btn outline round color="primary" size="sm" icon="remove_red_eye"/>
+            <q-btn outline round color="primary" size="sm" icon="remove_red_eye">
+              <q-menu
+                anchor="top right"
+                transition-show="flip-right"
+                transition-hide="flip-left"
+              >
+                <q-card style="max-width: 300px">
+                  <q-item>
+                    <q-item-section>
+                      <q-item-label>
+                        <q-chip
+                          v-for="(tag, index) in tagsForElement(item.tags)"
+                          :key="index" color="teal"
+                          dense
+                          clickable
+                          text-color="white"
+                          icon="bookmark"
+                          style="cursor: pointer"
+                          @click="(evt)=>tagClick(evt,tag)">
+                          {{tag}}
+                        </q-chip>
+                      </q-item-label>
+                    </q-item-section>
+                  </q-item>
+                </q-card>
+              </q-menu>
+            </q-btn>
             <q-btn outline round color="primary" size="sm" icon="play_for_work" @click="downloadOne(item)"/>
 <!--            <q-linear-progress v-if="item.process !== 0" :value="item.process" class="q-mt-md" />-->
           </q-card-actions>
@@ -72,6 +80,13 @@ export default {
       n: 0,
       m: 0,
     };
+  },
+  computed: {
+    tagsForElement() {
+      return (data) => {
+        return data.split(' ');
+      }
+    },
   },
   watch:{
     selectVal(newVal) {
@@ -129,6 +144,13 @@ export default {
     }.bind(this))
   },
   methods: {
+    /***
+     * 标签点击方法
+     * @param option
+     */
+    tagClick(evt, tag) {
+      eventBus.$emit('tagClick', tag)
+    },
     /***
      * 批量下载原图
      * @param option
