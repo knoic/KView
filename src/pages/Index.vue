@@ -8,7 +8,7 @@
 
 <script>
 import ImgBox from 'components/ImgBox';
-import { getPageList,getSum } from 'src/utils/getPreviewHtml';
+import { getPageList, getSum, getSumBYRequestXml } from 'src/utils/getPreviewHtml';
 import eventBus from 'src/utils/eventbus';
 
 export default {
@@ -95,7 +95,6 @@ export default {
           arr.push(...item)
         })
         this.imgObj = arr
-        console.log('界面相关数据赋值');
       })
     },
   }

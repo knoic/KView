@@ -102,7 +102,7 @@
 <script>
 import EssentialLink from 'components/EssentialLink.vue';
 import eventBus from 'src/utils/eventbus';
-import { getSum } from 'src/utils/getPreviewHtml';
+import { getSum, getSumBYRequestXml } from 'src/utils/getPreviewHtml';
 
 const linksData = [
   {
@@ -157,16 +157,18 @@ export default {
      * 搜索图片
      */
     searchFunction() {
+      getSumBYRequestXml(this.pageSize, this.key).then(res => {
+        this.max = res
+      })
       eventBus.$emit('searchFunction')
     },
     /***
-     * 获取站点总图片数
+     * 获取总页数
      */
     getSumNumber() {
       let _that = this
-      getSum().then(res => {
-        let max = Number(res)/_that.pageSize
-        _that.max = Number(res)%_that.pageSize === 0 ? parseInt(max) : parseInt(max) + 1
+      getSumBYRequestXml(this.pageSize, this.key).then(res => {
+        _that.max = res
       })
     },
     /***

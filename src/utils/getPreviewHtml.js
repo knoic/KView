@@ -101,6 +101,7 @@ function getPageList(pageSize, pageNumber, requestType, key) {
     key = key.replace(/ /g,'+')
     if(requestType === 1) {
     }else if (requestType === 2) {
+      // 弃用
       for(let i = startPage ; i <= startPage + x -1 ; i++) {
         urlList.push(config.url + '&page=' + i + '&limit=' + pageSize + '&tags=' + key)
       }
@@ -112,9 +113,7 @@ function getPageList(pageSize, pageNumber, requestType, key) {
         }
       })
     }else if (requestType === 3) {
-      for(let i = startPage ; i <= startPage + x -1 ; i++) {
-        urlList.push(config.apiUrl + '&page=' + i + '&limit=' + pageSize + '&tags=' + key)
-      }
+      urlList.push(config.apiUrl + '&page=' + pageNumber + '&limit=' + pageSize + '&tags=' + key)
       mapLimit(urlList, 100, requestKonachanApi, function(err, result){
         if(err) {
           reject(err);
@@ -148,11 +147,12 @@ function downLoad(imgUrl,i){
  */
 function requestKonachanApi(option, callback){
   request(option,function(err,res,body){
+    console.log(body);
     callback(null, eval("("+body+")"))
   })
 }
 /***
- * 请求首页，获取总图片数
+ * 请求首页，获取总图片数,弃用
  * @param pageSize
  * @param pageNumber
  * @returns {Promise<unknown>}
@@ -166,4 +166,23 @@ function getSum(){
     })
   })
 }
- export {start, getPageList, getSum}
+/***
+ * 请求首页，获取总图片数,弃用
+ * @param pageSize
+ * @param pageNumber
+ * @returns {Promise<unknown>}
+ */
+function getSumBYRequestXml(pageSize,key){
+  return new Promise(function (resolve, reject) {
+    key = key.replace(/ /g,'+')
+    request(config.apiUrlForXml+'&tags='+key, function (err, res, body) {
+      console.log('总页数',body);
+      let xml = new DOMParser().parseFromString(body, "text/xml")
+      let posts = xml.getElementsByTagName('posts')
+      let count = posts[0].attributes['count'].value
+      let page = Math.ceil(count/pageSize)
+      resolve(page)
+    })
+  })
+}
+ export {start, getPageList, getSum, getSumBYRequestXml}

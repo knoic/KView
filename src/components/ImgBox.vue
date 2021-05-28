@@ -87,15 +87,14 @@ export default {
     imgObj: Array
   },
   updated () {
-    console.log('updated');
-    this.$nextTick(()=>{
-      // 初始化tag库时间较长，避免堵塞
-      setTimeout(() => {
-        // require('../utils/dbUtils')
-        require('../utils/dbByDexie')
-      },1000)
-
-    })
+    // console.log('updated');
+    // this.$nextTick(()=>{
+    //   // 初始化tag库时间较长，避免堵塞
+    //   setTimeout(() => {
+    //     // require('../utils/dbUtils')
+    //     require('../utils/dbByDexie')
+    //   },1000)
+    // })
 
   },
   created() {
