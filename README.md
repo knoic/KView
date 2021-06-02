@@ -1,4 +1,4 @@
-KView是一款基于 electron&Vue 的 Konachan 桌面应用
+KView是一款基于 electron&Vue(with quasar) 的 Konachan 桌面应用
 
 ### Start the app in electron mode
 ```bash
