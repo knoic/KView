@@ -70,22 +70,6 @@
         />
       </q-toolbar>
     </q-footer>
-
-    <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-      content-class="bg-grey-1"
-    >
-      <q-list>
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
-    </q-drawer>
-
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -117,7 +101,7 @@ export default {
       essentialLinks: linksData,
       pageNumber: 1,
       selectAll: false,
-      pageSize: 21
+      pageSize: 1
     };
   },
   watch: {
@@ -147,7 +131,15 @@ export default {
     eventBus.$off("tagClick");
     eventBus.$on('tagClick', function(data){
       this.key = data
-    }.bind(this))
+    }.bind(this));
+    /***
+     * 监听快捷键ctrl-a
+     */
+    require('electron').ipcRenderer.on('ctrl-a', (event, message) => {
+      if(message){
+        this.selectAll = !this.selectAll
+      }
+    })
   },
   mounted() {
 

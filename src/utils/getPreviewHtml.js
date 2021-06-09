@@ -47,7 +47,6 @@ function startForPost(option, p){
         let result = res.toString().replace(/Post.register\(\{/g,'').replace(/\}\)/g,'')
         resArr.push(JSON.parse('{'+result+'}'))
       })
-      resolve(resArr)
     })
   })
 }
@@ -71,12 +70,12 @@ function startForBack(option, callback){
           }
         });
       }
-      callback({
-        url: option,
-        arr: arr
-      })
+      callback(222)
     })
 }
+startForBack(22,function (res){
+  console.log(res);
+})
 function requestWay(option, callback){
   startForPost(option).then(res => {
     callback(null,res)

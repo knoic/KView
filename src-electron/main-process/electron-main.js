@@ -40,6 +40,11 @@ function createWindow () {
     mainWindow = null
   })
   const path = require('path')
+
+  /***
+   * start
+   * 下载进度监听
+   */
   mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
     const filePath = path.join(app.getPath('downloads'), item.getFilename());
     item.setSavePath(filePath);
@@ -64,6 +69,11 @@ function createWindow () {
     });
     item.once('done', (event, state) => {
       if (state === 'completed') {
+        mainWindow.webContents.send('down-completed', {
+          // item: item,
+          name: item.getFilename(),
+          state: state
+        })
         //这里是主战场
       } else if (state=="cancelled") {
         //...
@@ -72,6 +82,79 @@ function createWindow () {
         //...
       }
     })
+  })
+  /***
+   * end
+   * 下载进度监听
+   */
+
+  setAppMenu()
+  setGlobalShortcut()
+}
+
+/***
+ * 设置程序菜单
+ */
+function setAppMenu() {
+  const { app, Menu } = require('electron')
+  const isMac = process.platform === 'darwin'
+  const template = [
+    {
+      label: '设置',
+      submenu: [
+        { label: '下载存储路径' },
+      ]
+    },
+    // { role: 'viewMenu' }
+    {
+      label: '视图',
+      submenu: [
+        { label: '刷新',role: 'reload'},
+      ]
+    },
+    {
+      label: '帮助',
+      submenu: [
+        {
+          label: '关于',
+          click: async () => {
+            const { shell } = require('electron')
+            await shell.openExternal('https://github.com/knoic/KView')
+          }
+        }
+      ]
+    }
+  ]
+
+  const menu = Menu.buildFromTemplate(template)
+  Menu.setApplicationMenu(menu)
+}
+/***
+ * 设置系统快捷键
+ */
+function setGlobalShortcut() {
+  const { app, globalShortcut } = require('electron')
+
+  app.whenReady().then(() => {
+    // Register a 'CommandOrControl+X' shortcut listener.
+    const ret = globalShortcut.register('CommandOrControl+A', () => {
+      mainWindow.webContents.send('ctrl-a', true)
+    })
+
+    if (!ret) {
+      console.log('registration failed')
+    }
+
+    // 检查快捷键是否注册成功
+    console.log(globalShortcut.isRegistered('CommandOrControl+X'))
+  })
+
+  app.on('will-quit', () => {
+    // 注销快捷键
+    globalShortcut.unregister('CommandOrControl+X')
+
+    // 注销所有快捷键
+    globalShortcut.unregisterAll()
   })
 }
 

@@ -47,16 +47,28 @@
       bordered
       content-class="bg-grey-3"
     >
-      <q-list>
+      <q-list style="width: 250px">
         <q-item clickable v-for="(item,index) in downLoadList" :key="index" style="background: #ffffff;">
           <q-item-section avatar>
-            <q-img :src="item.preview_url" style="width: 50px"/>
+            <q-circular-progress
+              show-value
+              font-size="10px"
+              class="q-ma-md"
+              :value="item.process"
+              size="60px"
+              :thickness="0.2"
+              color="primary"
+              track-color="grey-3"
+            >
+              <q-avatar size="54px">
+                <q-img :src="item.preview_url" style="height: 100px"/>
+              </q-avatar>
+            </q-circular-progress>
           </q-item-section>
           <q-item-section class="download-info">
             <div>
               author:{{item.author}}
             </div>
-            <q-linear-progress :value="item.process" class="q-mt-md" />
           </q-item-section>
         </q-item>
       </q-list>
@@ -172,10 +184,10 @@ export default {
       webContents().downloadURL(option.file_url)
       require('electron').ipcRenderer.on('down-process', (event, message) => {
         if(message.name == decodeURI(name)){
-          console.log('匹配');
+          console.log('匹配', message.name);
           _that.$set(option, 'process' , (message.receive/message.total)*100)
         }else {
-          console.log('不匹配',message.name, decodeURI(name));
+          console.log('不匹配', message.name, decodeURI(name));
         }
       })
       callback(null)
@@ -194,10 +206,12 @@ export default {
         webContents().downloadURL(item.file_url)
         require('electron').ipcRenderer.on('down-process', (event, message) => {
           if(message.name == decodeURI(name)){
-            console.log('匹配');
             _that.$set(item, 'process' , (message.receive/message.total)*100)
-          }else {
-            console.log('不匹配',message.name, decodeURI(name));
+          }
+        })
+        require('electron').ipcRenderer.on('down-completed', (event, message) => {
+          if(message.name == decodeURI(name)){
+            _that.$set(item, 'state' , message.state)
           }
         })
       }
@@ -214,7 +228,10 @@ export default {
   box-sizing: border-box;
 }
 .download-info{
-  font-size: 18px;
+  font-size: 12px;
   text-overflow:ellipsis
+}
+.q-item__section--side{
+  padding-right: 0px;
 }
 </style>
