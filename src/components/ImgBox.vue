@@ -3,7 +3,7 @@
     <template v-for="(item,index) in imgObj">
       <div class="my-card col-xs-6 col-sm-4 col-md-2 col-xl-1" :key="index">
         <q-card>
-          <q-img :src="item.preview_url" style="width: 1px"/>
+          <q-img :src="item.preview_url" style="width: 100%"/>
           <q-card-actions>
             <q-checkbox size="xs" v-model="selectVal" :val="item"/>
             <q-space />
@@ -223,9 +223,6 @@ export default {
 
 <style scoped>
 .my-card{
-  /*width: 24.5%;*/
-  /*float: left;*/
-  /*margin: 0.25%;*/
   box-sizing: border-box;
 }
 .download-info{

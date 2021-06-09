@@ -88,7 +88,7 @@ export default {
       },2000)
     },
     /***
-     * 图片获取方式：解析html中的js-》post代码
+     * 图片获取方式
      */
     getPageListFunction() {
       let arr = []
