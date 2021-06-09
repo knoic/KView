@@ -1,45 +1,51 @@
 <template>
-  <div  class="row q-col-gutter-xs">
-    <template v-for="(item,index) in imgObj">
-      <div class="my-card col-xs-6 col-sm-4 col-md-2 col-xl-1" :key="index">
-        <q-card>
-          <q-img :src="item.preview_url" style="width: 100%"/>
-          <q-card-actions>
-            <q-checkbox size="xs" v-model="selectVal" :val="item"/>
-            <q-space />
-            <q-btn outline round color="primary" size="sm" icon="remove_red_eye">
-              <q-menu
-                anchor="top right"
-                transition-show="flip-right"
-                transition-hide="flip-left"
-              >
-                <q-card style="max-width: 300px">
-                  <q-item>
-                    <q-item-section>
-                      <q-item-label>
-                        <q-chip
-                          v-for="(tag, index) in tagsForElement(item.tags)"
-                          :key="index" color="teal"
-                          dense
-                          clickable
-                          text-color="white"
-                          icon="bookmark"
-                          style="cursor: pointer"
-                          @click="(evt)=>tagClick(evt,tag)">
-                          {{tag}}
-                        </q-chip>
-                      </q-item-label>
-                    </q-item-section>
-                  </q-item>
-                </q-card>
-              </q-menu>
-            </q-btn>
-            <q-btn outline round color="primary" size="sm" icon="play_for_work" @click="downloadOne(item)"/>
-<!--            <q-linear-progress v-if="item.process !== 0" :value="item.process" class="q-mt-md" />-->
-          </q-card-actions>
-        </q-card>
+  <div  class="q-col-gutter-xs">
+    <q-infinite-scroll @load="onLoad" :offset="250">
+      <div class="row">
+        <template v-for="(item,index) in imgObj">
+          <div class="my-card col-xs-6 col-sm-4 col-md-2 col-xl-1" :key="index">
+            <q-card>
+              <q-img :src="item.preview_url" style="width: 1px"/>
+              <q-card-actions>
+                <q-checkbox size="xs" v-model="selectVal" :val="item"/>
+                <q-space />
+                <q-btn outline round color="primary" size="sm" icon="remove_red_eye">
+                  <q-menu
+                    anchor="top right"
+                    transition-show="flip-right"
+                    transition-hide="flip-left"
+                  >
+                    <q-card style="max-width: 300px">
+                      <q-item>
+                        <q-item-section>
+                          <q-item-label>
+                            <q-chip
+                              v-for="(tag, index) in tagsForElement(item.tags)"
+                              :key="index" color="teal"
+                              dense
+                              clickable
+                              text-color="white"
+                              icon="bookmark"
+                              style="cursor: pointer"
+                              @click="(evt)=>tagClick(evt,tag)">
+                              {{tag}}
+                            </q-chip>
+                          </q-item-label>
+                        </q-item-section>
+                      </q-item>
+                    </q-card>
+                  </q-menu>
+                </q-btn>
+                <q-btn outline round color="primary" size="sm" icon="play_for_work" @click="downloadOne(item)"/>
+                <!--            <q-linear-progress v-if="item.process !== 0" :value="item.process" class="q-mt-md" />-->
+              </q-card-actions>
+            </q-card>
+          </div>
+        </template>
       </div>
-    </template>
+
+    </q-infinite-scroll>
+
     <q-drawer
       v-model="downloadListDrawer"
       :width="250"
@@ -91,7 +97,8 @@ export default {
       selectVal: [],
       n: 0,
       m: 0,
-      store: null
+      store: null,
+      viewObj: Array
     };
   },
   computed: {
@@ -159,6 +166,12 @@ export default {
     }.bind(this))
   },
   methods: {
+    /***
+     * 图片列表懒加载
+     */
+    onLoad() {
+      console.log('----------到头了----------');
+    },
     /***
      * 标签点击方法
      * @param option
