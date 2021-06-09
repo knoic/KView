@@ -16,11 +16,11 @@
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.9",
     "core-js": "^3.6.5",
+    "dexie": "^3.0.3",
+    "electron-store": "^8.0.0",
     "quasar": "^1.0.0",
     "request": "^2.88.2",
-    "vue-uuid": "^2.0.2",
-    "dexie": "^3.0.3",
-    "electron-store": "^8.0.0"
+    "vue-uuid": "^2.0.2"
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0",

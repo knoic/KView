@@ -52,14 +52,6 @@
         >
         </q-btn>
         <q-space></q-space>
-<!--        <q-input filled v-model="pageSize" label="每页图片数" style="width: 10px">-->
-<!--          <template v-slot:prepend>-->
-<!--            <q-icon name="event" />-->
-<!--          </template>-->
-<!--          <template v-slot:after>-->
-<!--            <q-btn round dense flat icon="send" @click="setPageSize"/>-->
-<!--          </template>-->
-<!--        </q-input>-->
         <q-space />
         <q-pagination
           v-model="pageNumber"

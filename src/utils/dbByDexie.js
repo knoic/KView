@@ -21,17 +21,6 @@ db.tags.bulkAdd(tag.tagList).then (function(){
   console.log("error: " + error);
   db.close()
 });
-// })
-// db.tags.bulkAdd(aa.tagList).then (function(){
-//   //当数据存储完成后 我们可以读取它
-//   console.log('存储完成');
-// }).then(function (data) {
-//   console.log('新增完成');
-// }).catch(function(error) {
-//   console.log("error: " + error);
-//   db.close()
-// });
-// db.close()
 
 function getTagByApi(option){
   return new Promise(function (resolve, reject) {

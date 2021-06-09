@@ -146,7 +146,6 @@ function downLoad(imgUrl,i){
  */
 function requestKonachanApi(option, callback){
   request(option,function(err,res,body){
-    console.log(body);
     callback(null, eval("("+body+")"))
   })
 }
@@ -159,7 +158,6 @@ function requestKonachanApi(option, callback){
 function getSum(){
   return new Promise(function (resolve, reject) {
     request(config.indexUrl, function (err, res, body) {
-      console.log(body);
       let str = body.match(/Serving([\s\S]*?)posts/g)[0].toString().replace(/Serving|posts| |,/g,'')
       resolve(str)
     })
@@ -175,7 +173,6 @@ function getSumBYRequestXml(pageSize,key){
   return new Promise(function (resolve, reject) {
     key = key.replace(/ /g,'+')
     request(config.apiUrlForXml+'&tags='+key, function (err, res, body) {
-      console.log('总页数',body);
       let xml = new DOMParser().parseFromString(body, "text/xml")
       let posts = xml.getElementsByTagName('posts')
       let count = posts[0].attributes['count'].value

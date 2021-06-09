@@ -3,7 +3,7 @@
     <template v-for="(item,index) in imgObj">
       <div class="my-card col-xs-6 col-sm-4 col-md-2 col-xl-1" :key="index">
         <q-card>
-          <q-img :src="item.preview_url" style="width: 50px"/>
+          <q-img :src="item.preview_url" style="width: 1px"/>
           <q-card-actions>
             <q-checkbox size="xs" v-model="selectVal" :val="item"/>
             <q-space />
@@ -91,6 +91,7 @@ export default {
       selectVal: [],
       n: 0,
       m: 0,
+      store: null
     };
   },
   computed: {
@@ -125,6 +126,8 @@ export default {
 
   },
   created() {
+    const Store = require('electron-store');
+    this.store = new Store();
     /***
      * 下载勾选事件
      */
@@ -169,7 +172,8 @@ export default {
      */
     downloadImgByMapLimit(option) {
       const mapLimit = require('async/mapLimit')
-      mapLimit(option, 30, this.downloadImgForMap.bind(this), function(err, result){})
+      let maxDownload = this.store.get('maxDownload') === undefined ? 10 : this.store.get('maxDownload')
+      mapLimit(option, maxDownload, this.downloadImgForMap.bind(this), function(err, result){})
     },
     /***
      * 用于批量下载原图的请求方法
@@ -184,10 +188,7 @@ export default {
       webContents().downloadURL(option.file_url)
       require('electron').ipcRenderer.on('down-process', (event, message) => {
         if(message.name == decodeURI(name)){
-          console.log('匹配', message.name);
           _that.$set(option, 'process' , (message.receive/message.total)*100)
-        }else {
-          console.log('不匹配', message.name, decodeURI(name));
         }
       })
       callback(null)

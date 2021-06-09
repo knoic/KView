@@ -46,7 +46,15 @@ function createWindow () {
    * 下载进度监听
    */
   mainWindow.webContents.session.on('will-download', (event, item, webContents) => {
-    const filePath = path.join(app.getPath('downloads'), item.getFilename());
+    const Store = require('electron-store');
+    const store = new Store();
+    let filePath;
+    if(store.get('downloadPath') === undefined) {
+      filePath = path.join(app.getPath('downloads'), item.getFilename());
+    }else {
+      filePath = path.join(store.get('downloadPath'), item.getFilename());
+    }
+
     item.setSavePath(filePath);
     item.on('updated', (event, state) => {
       if (state === 'progressing') {
@@ -90,8 +98,26 @@ function createWindow () {
 
   setAppMenu()
   setGlobalShortcut()
+  loadElectronStore()
+  changePath()
 }
 
+function changePath() {
+  const { ipcMain } = require("electron");
+
+  ipcMain.on("changePath",(event,data) => {
+    console.log('changePath');
+
+    const {ipcRenderer, dialog} = require('electron');
+
+    dialog.showOpenDialog({
+      properties: ['openDirectory']
+    }).then(result=>{
+      console.log(result);        //输出结果
+      mainWindow.webContents.send('path-result', result.filePaths[0])
+    })
+  })
+}
 /***
  * 设置程序菜单
  */
@@ -102,7 +128,12 @@ function setAppMenu() {
     {
       label: '设置',
       submenu: [
-        { label: '下载存储路径' },
+        {
+          label: '下载设置',
+          click: async () => {
+            openDownloadSet()
+          }
+        },
       ]
     },
     // { role: 'viewMenu' }
@@ -129,6 +160,23 @@ function setAppMenu() {
   const menu = Menu.buildFromTemplate(template)
   Menu.setApplicationMenu(menu)
 }
+
+/***
+ * 初始化electron-store
+ */
+function loadElectronStore()  {
+  const Store = require('electron-store');
+  const store = new Store();
+  console.log('下载地址',app.getPath('downloads'));
+}
+
+/***
+ * 初始化electron-store
+ */
+function openDownloadSet()  {
+  mainWindow.webContents.send('open-download-set')
+}
+
 /***
  * 设置系统快捷键
  */
@@ -138,6 +186,7 @@ function setGlobalShortcut() {
   app.whenReady().then(() => {
     // Register a 'CommandOrControl+X' shortcut listener.
     const ret = globalShortcut.register('CommandOrControl+A', () => {
+      console.log('ctrl-a')
       mainWindow.webContents.send('ctrl-a', true)
     })
 

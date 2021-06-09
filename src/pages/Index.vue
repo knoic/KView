@@ -1,7 +1,8 @@
 <template>
   <q-pull-to-refresh @refresh="refresh">
     <div>
-        <img-box :img-obj="imgObj" class=""/>
+      <img-box :img-obj="imgObj" class=""/>
+      <DownloadSet></DownloadSet>
     </div>
   </q-pull-to-refresh>
 </template>
@@ -10,6 +11,7 @@
 import ImgBox from 'components/ImgBox';
 import { getPageList, getSum, getSumBYRequestXml } from 'src/utils/getPreviewHtml';
 import eventBus from 'src/utils/eventbus';
+import DownloadSet from 'components/DownloadSet'
 
 export default {
   name: 'PageIndex',
@@ -22,7 +24,7 @@ export default {
     };
   },
   components: {
-    ImgBox,
+    ImgBox, DownloadSet
   },
   watch: {
     pageSize(newVal) {
