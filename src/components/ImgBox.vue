@@ -182,11 +182,14 @@ export default {
       webContents().downloadURL(option.file_url)
       require('electron').ipcRenderer.on('down-process', (event, message) => {
         if(message.url == option.file_url){
+          _that.$set(option, 'ETag' , message.ETag)
+          _that.$set(option, 'state' , message.state)
           _that.$set(option, 'process' , (message.receive/message.total)*100)
         }
       })
       require('electron').ipcRenderer.on('down-completed', (event, message) => {
         if(message.url == option.file_url){
+          console.log('下载结束', message.state);
           _that.$set(option, 'state' , message.state)
         }
       })
@@ -214,11 +217,15 @@ export default {
           webContents().downloadURL(item.file_url)
           require('electron').ipcRenderer.on('down-process', (event, message) => {
             if(message.url == item.file_url){
+              _that.$set(item, 'ETag' , message.ETag)
+              _that.$set(item, 'state' , message.state)
               _that.$set(item, 'process' , (message.receive/message.total)*100)
             }
           })
           require('electron').ipcRenderer.on('down-completed', (event, message) => {
+            console.log('下载结束', message.state,message.url == item.file_url,);
             if(message.url == item.file_url){
+              console.log('下载结束', message.state);
               _that.$set(item, 'state' , message.state)
             }
           })

@@ -55,19 +55,37 @@ function createWindow () {
       filePath = path.join(store.get('downloadPath'), item.getFilename());
     }
     console.log('DownloadItem',item);
+    const { ipcMain } = require("electron");
+    // 下载暂停
+    ipcMain.on(item.getETag()+'pause',(event,data) => {
+      console.log('下载暂停');
+      item.pause()
+    })
+    // 下载恢复
+    ipcMain.on(item.getETag()+'resume',(event,data) => {
+      console.log('下载恢复');
+      item.resume()
+    })
     item.setSavePath(filePath);
     item.on('updated', (event, state) => {
       if (state === 'progressing') {
         if (item.isPaused()) {
-
-        }
-        else{
+          mainWindow.webContents.send('down-is-paused', {
+            // item: item,
+            name: item.getFilename(),
+            url: item.getURL(),
+            ETag: item.getETag(),
+            state: 'paused'
+          })
+        }else {
           mainWindow.webContents.send('down-process', {
             // item: item,
             name: item.getFilename(),
             url: item.getURL(),
             receive: item.getReceivedBytes(),
             total: item.getTotalBytes(),
+            ETag: item.getETag(),
+            state: state
           })
         }
       }
@@ -77,10 +95,13 @@ function createWindow () {
       }
     });
     item.once('done', (event, state) => {
+      console.log('完成',state);
       if (state === 'completed') {
+
         mainWindow.webContents.send('down-completed', {
           // item: item,
           name: item.getFilename(),
+          url: item.getURL(),
           state: state
         })
         //这里是主战场

@@ -7,19 +7,26 @@
           font-size="10px"
           class="q-ma-md"
           :value="item.process"
-          size="60px"
+          size="50px"
           :thickness="0.2"
           color="primary"
           track-color="grey-3"
         >
-          <q-avatar size="54px">
-            <q-img :src="item.preview_url" style="height: 100px"/>
+          <q-avatar size="48px">
+            <q-img :src="item.preview_url" style="height: 50px"/>
           </q-avatar>
         </q-circular-progress>
       </q-item-section>
       <q-item-section class="download-info">
-        <div>
+        <p>
           author:{{item.author}}
+        </p>
+      </q-item-section>
+      <q-item-section class="download-info">
+        <div>
+          <q-btn unelevated round color="primary" icon="play_arrow" size="small" v-if="item.state === 'pause'"/>
+          <q-btn unelevated round color="primary" icon="pause" size="small" v-if="item.state === 'progressing'" @click="pauseDownload(item)"/>
+          <q-btn unelevated round color="primary" icon="folder_open" size="small" v-if="item.state === 'completed'" @click="openFile"/>
         </div>
       </q-item-section>
     </q-item>
@@ -57,6 +64,26 @@ export default {
       },
       deep: true
     }
+  },
+  methods: {
+    /***
+     * 打开已完成下载的文件
+     */
+    openFile() {
+      console.log('打开文件');
+    },
+    /***
+     * 继续下载
+     */
+    resumeDownload(item) {
+      require('electron').ipcRenderer.send(item.ETag+'resume')
+    },
+    /***
+     * 暂停下载
+     */
+    pauseDownload(item) {
+      require('electron').ipcRenderer.send(item.ETag+'pause')
+    },
   }
 };
 </script>
