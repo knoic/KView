@@ -53,45 +53,22 @@
       bordered
       content-class="bg-grey-3"
     >
-      <q-list style="width: 250px">
-        <q-item clickable v-for="(item,index) in downLoadList" :key="index" style="background: #ffffff;">
-          <q-item-section avatar>
-            <q-circular-progress
-              show-value
-              font-size="10px"
-              class="q-ma-md"
-              :value="item.process"
-              size="60px"
-              :thickness="0.2"
-              color="primary"
-              track-color="grey-3"
-            >
-              <q-avatar size="54px">
-                <q-img :src="item.preview_url" style="height: 100px"/>
-              </q-avatar>
-            </q-circular-progress>
-          </q-item-section>
-          <q-item-section class="download-info">
-            <div>
-              author:{{item.author}}
-            </div>
-          </q-item-section>
-        </q-item>
-      </q-list>
+      <download-list v-model="downloadArr"></download-list>
     </q-drawer>
   </div>
 </template>
 
 <script>
-import { getBigImg } from 'src/utils/getBigImg';
+// import { getBigImg } from 'src/utils/getBigImg';
 import eventBus from 'src/utils/eventbus'
-import * as async from 'async/index';
-import { uuid } from 'vue-uuid';
+import DownloadList from 'components/DownloadList';
+// import * as async from 'async/index';
+// import { uuid } from 'vue-uuid';
 export default {
   name: 'Index',
   data() {
     return {
-      downLoadList: [],
+      downloadArr: [],
       downloadListDrawer: false,
       value: 0,
       selectVal: [],
@@ -100,6 +77,9 @@ export default {
       store: null,
       viewObj: Array
     };
+  },
+  components: {
+    DownloadList
   },
   computed: {
     tagsForElement() {
@@ -130,11 +110,12 @@ export default {
     //     require('../utils/dbByDexie')
     //   },1000)
     // })
-
   },
   created() {
     const Store = require('electron-store');
     this.store = new Store();
+    this.downloadArr = this.store.get('downloadArr')==undefined?[]:this.store.get('downloadArr')
+    console.log('this.downloadArr',this.downloadArr);
     /***
      * 下载勾选事件
      */
@@ -195,13 +176,18 @@ export default {
       let  _that = this
       const nameArr = option.file_url.split("/")
       let name = nameArr[nameArr.length-1]
-      _that.downLoadList.push(option)
+      _that.downloadArr.push(option)
       const { remote } = require('electron')
       let webContents = remote.getCurrentWebContents
       webContents().downloadURL(option.file_url)
       require('electron').ipcRenderer.on('down-process', (event, message) => {
-        if(message.name == decodeURI(name)){
+        if(message.url == option.file_url){
           _that.$set(option, 'process' , (message.receive/message.total)*100)
+        }
+      })
+      require('electron').ipcRenderer.on('down-completed', (event, message) => {
+        if(message.url == option.file_url){
+          _that.$set(option, 'state' , message.state)
         }
       })
       callback(null)
@@ -213,21 +199,32 @@ export default {
       let  _that = this
       const nameArr = item.file_url.split("/")
       let name = nameArr[nameArr.length-1]
-      _that.downLoadList.push(item)
-      const { remote } = require('electron')
-      let webContents = remote.getCurrentWebContents
-      if(item.file_url !== undefined) {
-        webContents().downloadURL(item.file_url)
-        require('electron').ipcRenderer.on('down-process', (event, message) => {
-          if(message.name == decodeURI(name)){
-            _that.$set(item, 'process' , (message.receive/message.total)*100)
-          }
-        })
-        require('electron').ipcRenderer.on('down-completed', (event, message) => {
-          if(message.name == decodeURI(name)){
-            _that.$set(item, 'state' , message.state)
-          }
-        })
+      let isHasBool = false
+      _that.downloadArr.find((res)=>{
+        if(res.file_url === item.file_url){
+          isHasBool = true
+        }
+      })
+      if(!isHasBool) {
+        _that.downloadArr.push(item)
+        const { remote } = require('electron')
+        let webContents = remote.getCurrentWebContents
+        // 开始下载
+        if(item.file_url !== undefined) {
+          webContents().downloadURL(item.file_url)
+          require('electron').ipcRenderer.on('down-process', (event, message) => {
+            if(message.url == item.file_url){
+              _that.$set(item, 'process' , (message.receive/message.total)*100)
+            }
+          })
+          require('electron').ipcRenderer.on('down-completed', (event, message) => {
+            if(message.url == item.file_url){
+              _that.$set(item, 'state' , message.state)
+            }
+          })
+        }
+      }else {
+        console.log('该下载任务已存在');
       }
     }
   }

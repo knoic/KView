@@ -54,7 +54,7 @@ function createWindow () {
     }else {
       filePath = path.join(store.get('downloadPath'), item.getFilename());
     }
-
+    console.log('DownloadItem',item);
     item.setSavePath(filePath);
     item.on('updated', (event, state) => {
       if (state === 'progressing') {
@@ -65,6 +65,7 @@ function createWindow () {
           mainWindow.webContents.send('down-process', {
             // item: item,
             name: item.getFilename(),
+            url: item.getURL(),
             receive: item.getReceivedBytes(),
             total: item.getTotalBytes(),
           })
@@ -102,18 +103,16 @@ function createWindow () {
   changePath()
 }
 
+/***
+ * 设置下载路径
+ */
 function changePath() {
   const { ipcMain } = require("electron");
-
   ipcMain.on("changePath",(event,data) => {
-    console.log('changePath');
-
-    const {ipcRenderer, dialog} = require('electron');
-
+    const { dialog } = require('electron');
     dialog.showOpenDialog({
       properties: ['openDirectory']
     }).then(result=>{
-      console.log(result);        //输出结果
       mainWindow.webContents.send('path-result', result.filePaths[0])
     })
   })
@@ -167,7 +166,6 @@ function setAppMenu() {
 function loadElectronStore()  {
   const Store = require('electron-store');
   const store = new Store();
-  console.log('下载地址',app.getPath('downloads'));
 }
 
 /***
@@ -177,6 +175,12 @@ function openDownloadSet()  {
   mainWindow.webContents.send('open-download-set')
 }
 
+function downloadFunction() {
+  const { ipcMain } = require("electron");
+  ipcMain.on("start-download",(event,data) => {
+    console.log(data);
+  })
+}
 /***
  * 设置系统快捷键
  */
@@ -186,16 +190,12 @@ function setGlobalShortcut() {
   app.whenReady().then(() => {
     // Register a 'CommandOrControl+X' shortcut listener.
     const ret = globalShortcut.register('CommandOrControl+A', () => {
-      console.log('ctrl-a')
       mainWindow.webContents.send('ctrl-a', true)
     })
 
     if (!ret) {
       console.log('registration failed')
     }
-
-    // 检查快捷键是否注册成功
-    console.log(globalShortcut.isRegistered('CommandOrControl+X'))
   })
 
   app.on('will-quit', () => {
